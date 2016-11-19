@@ -1,19 +1,16 @@
 var express = require('express')
 var app = express()
+var bodyParser = require('body-parser');
+var multer = require('multer');
+var upload = multer();
 
-var stockName = function (req, res, next) {
-    console.log("\t=================");
-    console.log("\tRequest Received!");
-    console.log("\t=================");
-    console.log(Date.now())
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.post('/', upload.array(), function (req, res) {
+  
     console.log(req.body);
-    next()
-}
-
-app.use(stockName)
-
-app.get('/', function (req, res) {
-  res.send('Hello World!')
+    res.json(req.body);
 })
 
 app.listen(80, function () {
