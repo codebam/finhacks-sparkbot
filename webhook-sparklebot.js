@@ -13,9 +13,9 @@ var optionsMessageDetails = {
     path: '',
     method: 'GET',
     json: true,
-    headers: { 
-	'Content-Type': 'application/json; charset=utf-8',
-	'Authorization': 'Bearer OWIyNDZmZjAtMTI5OS00ODk5LWExMWUtZDA3NTQ2MzIzM2RiYWRhY2UxNGYtZjMw'
+    headers: {
+    'Content-Type': 'application/json; charset=utf-8',
+    'Authorization': 'Bearer OWIyNDZmZjAtMTI5OS00ODk5LWExMWUtZDA3NTQ2MzIzM2RiYWRhY2UxNGYtZjMw'
      }
 };
 
@@ -29,14 +29,13 @@ app.post('/', upload.array(), function (req, res) {
     optionsMessageDetails['path'] = '/v1/messages/' + messageId;
     console.log(optionsMessageDetails);
     var messageDetailsJSON = https.get(optionsMessageDetails, function(elem) {
-	var bodyParser = require('body-parser')	
-	app.use(bodyParser.json());
-	console.log(elem.body);
-    });	
+    var bodyParser = require('body-parser')
+    app.use(bodyParser.json());
+    console.log(elem.body);
+    });
     res.json(req.body);
 })
 
 app.listen(80, function () {
   console.log('Example app listening on port 80!')
 })
-
