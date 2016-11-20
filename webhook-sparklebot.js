@@ -60,6 +60,7 @@ app.post('/', jsonParser, function(req, res) {
 
 function get_lookup_stock(stock_name) {
     if (stock_name === '') {
+        console.log('no applicable stock name')
         return [];
     };
     MarkItOnDemandAPI['path'] = '/v2/Lookup/json?input=' + stock_name;
@@ -84,7 +85,7 @@ function get_stock_price(stock_code) {
         googleFinanceAPI['url'] = 'https://' + googleFinanceAPI['host'] + googleFinanceAPI['path'];
         request.get(googleFinanceAPI, function(error, response, body) {
             console.log('text: ' + response.toJSON()['body']['text']);
-        stocks_dict[stocks_dict[i]] = stocks_dict[i]['l_cur'];
+        stocks_dict[stocks_dict[i]] = response.toJSON()[i]['l_cur'];
         });
         return stocks_dict;
     };
