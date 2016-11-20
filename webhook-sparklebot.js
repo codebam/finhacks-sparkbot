@@ -42,19 +42,19 @@ app.post('/', jsonParser, function(req, res) {
     request.get(optionsMessageDetails, function(error, response, body) {
         console.log('text: ' + response.toJSON()['body']['text']);
     });
+    console.log(get_stock_price(['GOOGL']));
 })
 
 function get_stock_price(stock_code) {
     var stocks_dict = new Array();
     for (var i = 0; i < stock_code.length; i++) {
-        var inJSONBody = req.body;
-        var messageId = inJSONBody['data']['id'];
-        console.log('messageId: ' + messageId);
         optionsMessageDetails['path'] = '/finance/info?client=ig&q=' + stock_code[i];
         optionsMessageDetails['url'] = 'https://' + optionsMessageDetails['host'] + optionsMessageDetails['path'];
         request.get(optionsMessageDetails, function(error, response, body) {
             console.log('text: ' + response.toJSON()['body']['text']);
+        stocks_dict[stocks_dict[i]] = stocks_dict[i]['l_cur'];
         });
+        return stocks_dict;
     }
 }
 
