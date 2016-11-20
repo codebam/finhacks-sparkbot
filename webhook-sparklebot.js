@@ -53,9 +53,14 @@ app.post('/', jsonParser, function(req, res) {
     optionsMessageDetails['url'] += messageId;
     request.get(optionsMessageDetails, function(error, response, body) {
         if (response.toJSON()['body']['text'] !== 'undefined') {
+console.log("passing: "+response.toJSON()['body']['text'] );
             fy.snapshot({ symbol: response.toJSON()['body']['text'] }, function (err, snapshot) {// console.log("error is "+err);
-            // console.log("snapshot is "+ JSON.stringify(snapshot));
-            post_message(snapshot['ask']);});
+console.log("recieved a quote of "+snapshot['ask']);
+console.log("body = "+JSON.stringify(body));
+console.log("inJSONBody = "+ JSON.stringify(inJSONBody));
+//console.log("manually aborting 1");
+//process.exit();
+            post_message(snapshot['ask'], body['id']);});
         }
     });
 })
