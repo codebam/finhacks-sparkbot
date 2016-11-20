@@ -48,22 +48,25 @@ var jsonParser = (bodyParser.json());
 
 app.post('/', jsonParser, function(req, res) {
     var inJSONBody = req.body;
-    var messageId = inJSONBody['data']['id'];
+console.log("inJSONBody = "+ JSON.stringify(inJSONBody));
+if ( inJSONBody.data.personEmail != "sparquelles@sparkbot.io")
+{    console.log("processing a message for "+inJSONBody.data.personEmail);
+var messageId = inJSONBody['data']['id'];
     console.log('messageId: ' + messageId);
     optionsMessageDetails['url'] += messageId;
     request.get(optionsMessageDetails, function(error, response, body) {
-        if (response.toJSON()['body']['text'] !== 'undefined') {
+console.log("before response.get call");
+        if (response.toJSON()['body']['text'] != undefined) {
 console.log("passing: "+response.toJSON()['body']['text'] );
             fy.snapshot({ symbol: response.toJSON()['body']['text'] }, function (err, snapshot) {// console.log("error is "+err);
 //console.log("recieved a quote of "+snapshot['ask']);
 //console.log("body = "+JSON.stringify(body));
-//console.log("inJSONBody = "+ JSON.stringify(inJSONBody));
 //console.log("manually aborting 1");
 //process.exit();
             post_message(snapshot['ask'], body['id'], body['personId']/*inJSONBody['personEmail']*/);});
         }
     });
-})
+}})
 
 
 function get_lookup_stock(stock_name) {
@@ -117,11 +120,12 @@ function post_message(message_text, roomid, personId) {
                     'Authorization': "Bearer OWIyNDZmZjAtMTI5OS00ODk5LWExMWUtZDA3NTQ2MzIzM2RiYWRhY2UxNGYtZjMw"
             }
         }, function (error, response, body){
-                console.log("myJSONObject = "+JSON.stringify(myJSONObject));
+//                console.log("myJSONObject = "+JSON.stringify(myJSONObject));
 //                console.log("MSGText ="+message_text);
 //                console.log("roomId="+roomid);
-                console.log("response="+JSON.stringify(response['body']['message']));
-process.exit();
+                console.log("response error msg="+JSON.stringify(response['body']['message']));
+//                console.log("response="+JSON.stringify(response['b));
+//process.exit();
         });
 }
 
