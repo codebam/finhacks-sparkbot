@@ -11,8 +11,8 @@ var multer = require('multer');
 var upload = multer();
 
 //object for GET message details **HTTPS REQUIRED**
-var optionsMessageDetails = {
-    url: 'https://api.ciscospark.com/v1/messages/',
+var optionsMessageDetailsOriginal = {
+    url: "",
     method: 'GET',
     json: true,
     headers: {
@@ -53,9 +53,11 @@ if ( inJSONBody.data.personEmail != "sparquelles@sparkbot.io")
 {    console.log("processing a message for "+inJSONBody.data.personEmail);
 var messageId = inJSONBody['data']['id'];
     console.log('messageId: ' + messageId);
-    optionsMessageDetails['url'] += messageId;
+var     optionsMessageDetails = optionsMessageDetailsOriginal;
+    optionsMessageDetails['url'] = 'https://api.ciscospark.com/v1/messages/'+messageId;
     request.get(optionsMessageDetails, function(error, response, body) {
 console.log("before response.get call");
+console.log("optionsMessageDetails = "+ JSON.stringify(optionsMessageDetails));
 console.log("msg text ="+ JSON.stringify(response));
         if (response.toJSON()['body']['text'] != undefined) {
 console.log("passing: "+response.toJSON()['body']['text'] );
