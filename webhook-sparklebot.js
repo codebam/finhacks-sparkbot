@@ -1,5 +1,6 @@
 var http = require('http');
 var https = require('https');
+var request = require('request');
 
 var express = require('express')
 var app = express()
@@ -11,6 +12,7 @@ var upload = multer();
 var optionsMessageDetails = {
     host: 'api.ciscospark.com',
     path: '',
+    url: '',
     method: 'GET',
     json: true,
     headers: {
@@ -19,23 +21,25 @@ var optionsMessageDetails = {
      }
 };
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+var jsonParser = (bodyParser.json());
+var jsonParser2 = (bodyParser.json());
+var urlencodedParser = (bodyParser.urlencoded({ extended: true }));
 
-app.post('/', upload.array(), function (req, res) {
+app.post('/', jsonParser, function (req, res) {
     var inJSONBody = req.body;
     var messageId = inJSONBody['data']['id'];
-    console.log(messageId);
+    console.log('messageId: ' + messageId);
     optionsMessageDetails['path'] = '/v1/messages/' + messageId;
-    console.log(optionsMessageDetails);
-    var messageDetailsJSON = https.get(optionsMessageDetails, function(elem) {
-    var bodyParser = require('body-parser')
-    app.use(bodyParser.json());
-    console.log(elem.body);
-    });
+    optionsMessageDetails['url'] = 'https://' + optionsMessageDetails['host'] + optionsMessageDetails['path'];
+    var messageDetailsJSON = request.get(optionsMessageDetails, function(error, response, body) { 
+            console.log('text: ' + response.toJSON()['body']['text']);
+    }); 
+    //console.log(messageDetailsJSON);
     res.json(req.body);
 })
 
 app.listen(80, function () {
-  console.log('Example app listening on port 80!')
+    console.log('-----------------------------------');
+    console.log(' Example app listening on port 80!');
+    console.log('-----------------------------------');
 })
