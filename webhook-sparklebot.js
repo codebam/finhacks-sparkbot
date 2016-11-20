@@ -1,6 +1,7 @@
 var http = require('http');
 var https = require('https');
 var request = require('request');
+var fy = require("yahoo-finance");
 
 var express = require('express');
 var app = express();
@@ -52,7 +53,9 @@ app.post('/', jsonParser, function(req, res) {
     optionsMessageDetails['url'] += messageId;
     request.get(optionsMessageDetails, function(error, response, body) {
         if (response.toJSON()['body']['text'] !== 'undefined') {
-            post_message(get_stock_price(response.toJSON()['body']['text']), response.toJSON()['body']['roomId']);
+            fy.snapshot({ symbol: response.toJSON()['body']['text'] }, function (err, snapshot) {// console.log("error is "+err);
+            // console.log("snapshot is "+ JSON.stringify(snapshot));
+            post_message(snapshot['ask']);});
         }
     });
 })
