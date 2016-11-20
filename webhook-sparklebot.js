@@ -9,10 +9,9 @@ var bodyParser = require('body-parser');
 var multer = require('multer');
 var upload = multer();
 
+//object for GET message details **HTTPS REQUIRED**
 var optionsMessageDetails = {
-    host: 'api.ciscospark.com',
-    path: '',
-    url: '',
+    url: 'https://api.ciscospark.com/v1/messages/',
     method: 'GET',
     json: true,
     headers: {
@@ -28,9 +27,9 @@ var urlencodedParser = (bodyParser.urlencoded({ extended: true }));
 app.post('/', jsonParser, function (req, res) {
     var inJSONBody = req.body;
     var messageId = inJSONBody['data']['id'];
-    console.log('messageId: ' + messageId);
-    optionsMessageDetails['path'] = '/v1/messages/' + messageId;
-    optionsMessageDetails['url'] = 'https://' + optionsMessageDetails['host'] + optionsMessageDetails['path'];
+    //console.log('messageId: ' + messageId);
+    optionsMessageDetails['url'] += messageId;
+    //console.log('builtUrl: ' + optionsMessageDetails['url']);
     var messageDetailsJSON = request.get(optionsMessageDetails, function(error, response, body) { 
             console.log('text: ' + response.toJSON()['body']['text']);
     }); 
