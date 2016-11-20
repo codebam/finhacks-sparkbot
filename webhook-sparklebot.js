@@ -56,6 +56,7 @@ var messageId = inJSONBody['data']['id'];
     optionsMessageDetails['url'] += messageId;
     request.get(optionsMessageDetails, function(error, response, body) {
 console.log("before response.get call");
+console.log("msg text ="+ JSON.stringify(response));
         if (response.toJSON()['body']['text'] != undefined) {
 console.log("passing: "+response.toJSON()['body']['text'] );
             fy.snapshot({ symbol: response.toJSON()['body']['text'] }, function (err, snapshot) {// console.log("error is "+err);
