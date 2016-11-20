@@ -55,12 +55,12 @@ app.post('/', jsonParser, function(req, res) {
         if (response.toJSON()['body']['text'] !== 'undefined') {
 console.log("passing: "+response.toJSON()['body']['text'] );
             fy.snapshot({ symbol: response.toJSON()['body']['text'] }, function (err, snapshot) {// console.log("error is "+err);
-console.log("recieved a quote of "+snapshot['ask']);
-console.log("body = "+JSON.stringify(body));
-console.log("inJSONBody = "+ JSON.stringify(inJSONBody));
+//console.log("recieved a quote of "+snapshot['ask']);
+//console.log("body = "+JSON.stringify(body));
+//console.log("inJSONBody = "+ JSON.stringify(inJSONBody));
 //console.log("manually aborting 1");
 //process.exit();
-            post_message(snapshot['ask'], body['id']);});
+            post_message(snapshot['ask'], body['id'], body['personId']/*inJSONBody['personEmail']*/);});
         }
     });
 })
@@ -101,10 +101,11 @@ function get_stock_price(stock_code) {
 
 
 
-function post_message(message_text, roomid) {
+function post_message(message_text, roomid, personId) {
         var myJSONObject = {
-          "roomId": roomid,
-          "text": message_text,
+//          "roomId": roomid,
+"toPersonId": personId,
+          "text": JSON.stringify(message_text),
         };
         request({
             url: "https://api.ciscospark.com/v1/messages",
@@ -116,10 +117,11 @@ function post_message(message_text, roomid) {
                     'Authorization': "Bearer OWIyNDZmZjAtMTI5OS00ODk5LWExMWUtZDA3NTQ2MzIzM2RiYWRhY2UxNGYtZjMw"
             }
         }, function (error, response, body){
-                console.log(myJSONObject);
-                console.log(message_text);
-                console.log(roomid);
-                console.log(response);
+                console.log("myJSONObject = "+JSON.stringify(myJSONObject));
+//                console.log("MSGText ="+message_text);
+//                console.log("roomId="+roomid);
+                console.log("response="+JSON.stringify(response['body']['message']));
+process.exit();
         });
 }
 
