@@ -15,8 +15,8 @@ var optionsMessageDetails = {
     method: 'GET',
     json: true,
     headers: {
-    'Content-Type': 'application/json; charset=utf-8',
-    'Authorization': 'Bearer OWIyNDZmZjAtMTI5OS00ODk5LWExMWUtZDA3NTQ2MzIzM2RiYWRhY2UxNGYtZjMw'
+        'Content-Type': 'application/json; charset=utf-8',
+        'Authorization': 'Bearer OWIyNDZmZjAtMTI5OS00ODk5LWExMWUtZDA3NTQ2MzIzM2RiYWRhY2UxNGYtZjMw'
     }
 };
 
@@ -27,26 +27,26 @@ var googleFinanceAPI = {
     method: 'GET',
     json: true,
     headers: {
-    'Content-Type': 'application/json; charset=utf-8',
+        'Content-Type': 'application/json; charset=utf-8',
     }
 };
 
 var jsonParser = (bodyParser.json());
 
-app.post('/', jsonParser, function (req, res) {
+app.post('/', jsonParser, function(req, res) {
     var inJSONBody = req.body;
     var messageId = inJSONBody['data']['id'];
     console.log('messageId: ' + messageId);
     optionsMessageDetails['path'] = '/v1/messages/' + messageId;
     optionsMessageDetails['url'] = 'https://' + optionsMessageDetails['host'] + optionsMessageDetails['path'];
     request.get(optionsMessageDetails, function(error, response, body) {
-            console.log('text: ' + response.toJSON()['body']['text']);
+        console.log('text: ' + response.toJSON()['body']['text']);
     });
 })
 
 function get_stock_price(stock_code) {
     var stocks_dict = new Array();
-    for (i = 0; i < stock_code.length, i++) {
+    for (var i = 0; i < stock_code.length; i++) {
         var inJSONBody = req.body;
         var messageId = inJSONBody['data']['id'];
         console.log('messageId: ' + messageId);
@@ -58,7 +58,7 @@ function get_stock_price(stock_code) {
     }
 }
 
-app.listen(80, function () {
+app.listen(80, function() {
     console.log('-----------------------------------');
     console.log(' Example app listening on port 80!');
     console.log('-----------------------------------');
