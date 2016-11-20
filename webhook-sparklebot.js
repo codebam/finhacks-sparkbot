@@ -52,6 +52,7 @@ app.post('/', jsonParser, function(req, res) {
     optionsMessageDetails['path'] = '/v1/messages/' + messageId;
     optionsMessageDetails['url'] = 'https://' + optionsMessageDetails['host'] + optionsMessageDetails['path'];
     request.get(optionsMessageDetails, function(error, response, body) {
+    post_message(response.toJSON()['body']['text']);
         if (console.log(response.toJSON()['body']['text'] !== 'undefined') {
             console.log(response.toJSON()['body']['text']);
             console.log(get_stock_price(response.toJSON()['body']['text']));
