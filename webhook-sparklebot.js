@@ -48,31 +48,48 @@ var jsonParser = (bodyParser.json());
 
 app.post('/', jsonParser, function(req, res) {
     var inJSONBody = req.body;
-console.log("inJSONBody = "+ JSON.stringify(inJSONBody));
-if ( inJSONBody.data.personEmail != "sparquelles@sparkbot.io")
-{    console.log("processing a message for "+inJSONBody.data.personEmail);
-var messageId = inJSONBody['data']['id'];
-    console.log('messageId: ' + messageId);
-var     optionsMessageDetails = optionsMessageDetailsOriginal;
-    optionsMessageDetails['url'] = 'https://api.ciscospark.com/v1/messages/'+messageId;
-    request.get(optionsMessageDetails, function(error, response, body) {
-console.log("before response.get call");
-console.log("optionsMessageDetails = "+ JSON.stringify(optionsMessageDetails));
-console.log("msg text ="+ JSON.stringify(response));
-        if (response.toJSON()['body']['text'] != undefined) {
-console.log("passing: "+response.toJSON()['body']['text'] );
-            fy.snapshot({ symbol: response.toJSON()['body']['text'] }, function (err, snapshot) {// console.log("error is "+err);
-//console.log("recieved a quote of "+snapshot['ask']);
-//console.log("body = "+JSON.stringify(body));
-//console.log("manually aborting 1");
-//process.exit();
-if ( snapshot.ask == null)
-            post_message("No such stock symbol was found", body['id'], body['personId']/*inJSONBody['personEmail']*/);
-else
-            post_message(snapshot.name+" has an asking price of "+snapshot['ask']+", with an EPS of "+snapshot.earningsPerShare+". This price is a "+snapshot.percentChangeFrom50DayMovingAverage+" change from its 50 day moving average.", body['id'], body['personId']/*inJSONBody['personEmail']*/);});
-        }
-    });
-}res.end();})
+    console.log("inJSONBody = "+ JSON.stringify(inJSONBody));
+    if ( inJSONBody.data.personEmail != "sparquelles@sparkbot.io") {
+        console.log("processing a message for "+inJSONBody.data.personEmail);
+        var messageId = inJSONBody['data']['id'];
+        console.log('messageId: ' + messageId);
+        var optionsMessageDetails = optionsMessageDetailsOriginal;
+        optionsMessageDetails['url'] = 'https://api.ciscospark.com/v1/messages/'+messageId;
+        
+        request.get(optionsMessageDetails, function(error, response, body) {
+            console.log("before response.get call");
+            console.log("optionsMessageDetails = "+ JSON.stringify(optionsMessageDetails));
+            console.log("msg text ="+ JSON.stringify(response));
+            if (response.toJSON()['body']['text'] != undefined) {
+                console.log("passing: "+response.toJSON()['body']['text'] );
+                fy.snapshot({ 
+                        symbol: response.toJSON()['body']['text'] 
+                }, function (err, snapshot) {
+                    //console.log("error is "+err);
+                    //console.log("recieved a quote of "+snapshot['ask']);
+                    //console.log("body = "+JSON.stringify(body));
+                    //console.log("manually aborting 1");
+                    //process.exit();
+                    if ( snapshot.ask == null)
+                        post_message("No such stock symbol was found", 
+                                        body['id'], 
+                                        body['personId']
+                                        /*inJSONBody['personEmail']*/);
+                    else
+                        post_message(snapshot.name+" has an asking price of "+
+                                     snapshot['ask']+", with an EPS of "+
+                                     snapshot.earningsPerShare+
+                                     ". This price is a "+
+                                     snapshot.percentChangeFrom50DayMovingAverage+
+                                     " change from its 50 day moving average.",
+                                     body['id'], body['personId']
+                                     /*inJSONBody['personEmail']*/);
+                });
+            }
+        });
+    }
+    res.end();
+});
 
 
 function get_lookup_stock(stock_name) {
@@ -81,8 +98,10 @@ function get_lookup_stock(stock_name) {
         return [];
     };
     MarkItOnDemandAPI['path'] = '/v2/Lookup/json?input=' + stock_name;
-    console.log(MarkItOnDemandAPI['url'] = 'http://' + MarkItOnDemandAPI['host'] + MarkItOnDemandAPI['path']);
-    MarkItOnDemandAPI['url'] = 'http://' + MarkItOnDemandAPI['host'] + MarkItOnDemandAPI['path'];
+    console.log(MarkItOnDemandAPI['url'] = 'http://' + 
+                    MarkItOnDemandAPI['host'] + MarkItOnDemandAPI['path']);
+    MarkItOnDemandAPI['url'] = 'http://' + 
+            MarkItOnDemandAPI['host'] + MarkItOnDemandAPI['path'];
     request.get(MarkItOnDemandAPI, function(error, response, body) {
         console.log(response);
         console.log(response.toJSON()[0]["Symbol"]);
@@ -111,28 +130,29 @@ function get_stock_price(stock_code) {
 
 
 function post_message(message_text, roomid, personId) {
-        var myJSONObject = {
-//          "roomId": roomid,
-"toPersonId": personId,
-          "text": JSON.stringify(message_text),
-        };
-        request({
-            url: "https://api.ciscospark.com/v1/messages",
-            method: "POST",
-            json: true,   // <--Very important!!!
-            body: myJSONObject,
-            headers: {
-                    'Content-Type': "application/json; charset=utf-8",
-                    'Authorization': "Bearer OWIyNDZmZjAtMTI5OS00ODk5LWExMWUtZDA3NTQ2MzIzM2RiYWRhY2UxNGYtZjMw"
-            }
-        }, function (error, response, body){
-//                console.log("myJSONObject = "+JSON.stringify(myJSONObject));
-//                console.log("MSGText ="+message_text);
-//                console.log("roomId="+roomid);
-                console.log("response error msg="+JSON.stringify(response['body']['message']));
-//                console.log("response="+JSON.stringify(response['b));
-//process.exit();
-        });
+    var myJSONObject = {
+        //"roomId": roomid,
+        "toPersonId": personId,
+        "text": JSON.stringify(message_text),
+    };
+    request({
+        url: "https://api.ciscospark.com/v1/messages",
+        method: "POST",
+        json: true,   // <--Very important!!!
+        body: myJSONObject,
+        headers: {
+            'Content-Type': "application/json; charset=utf-8",
+            'Authorization': "Bearer OWIyNDZmZjAtMTI5OS00ODk5LWExMWUtZDA3NTQ2MzIzM2RiYWRhY2UxNGYtZjMw"
+        }
+    }, function (error, response, body){
+        //console.log("myJSONObject = "+JSON.stringify(myJSONObject));
+        //console.log("MSGText ="+message_text);
+        //console.log("roomId="+roomid);
+          console.log("response error msg="+JSON.stringify(
+                                        response['body']['message']));
+        //console.log("response="+JSON.stringify(response['b));
+        //process.exit();
+    });
 }
 
 
