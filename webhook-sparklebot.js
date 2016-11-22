@@ -66,10 +66,13 @@ console.log("passing: "+response.toJSON()['body']['text'] );
 //console.log("body = "+JSON.stringify(body));
 //console.log("manually aborting 1");
 //process.exit();
-            post_message(snapshot['ask'], body['id'], body['personId']/*inJSONBody['personEmail']*/);});
+if ( snapshot.ask == null)
+            post_message("No such stock symbol was found", body['id'], body['personId']/*inJSONBody['personEmail']*/);
+else
+            post_message(snapshot.name+" has an asking price of "+snapshot['ask']+", with an EPS of "+snapshot.earningsPerShare+". This price is a "+snapshot.percentChangeFrom50DayMovingAverage+" change from its 50 day moving average.", body['id'], body['personId']/*inJSONBody['personEmail']*/);});
         }
     });
-}})
+}res.end();})
 
 
 function get_lookup_stock(stock_name) {
