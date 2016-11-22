@@ -1,0 +1,14 @@
+{
+        "auth_tokens":{
+                {
+                        "cisco_spark": {
+                                "api_key": ""
+                        }
+                },
+                {
+                        "slack": {
+                                "api_key": ""
+                        }
+                }
+        }
+}
