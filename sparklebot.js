@@ -10,6 +10,20 @@ var bodyParser = require('body-parser');
 var multer = require('multer');
 var upload = multer();
 
+var fs = require('fs');
+var ciscospark_apikey = '';
+var api_key;
+fs.readFile('auth_tokens.json', 'utf8', function (err, data) {
+    if (err) throw err;
+    apikey = JSON.parse(data);
+    try {
+        ciscospark_apikey = apikey["auth_tokens"]["cisco_spark"]["api_key"];
+    }
+    catch (e) {
+    console.log('cisco spark key could not be read');
+    }
+});
+
 //object for GET message details **HTTPS REQUIRED**
 var optionsMessageDetailsOriginal = {
     url: "",
@@ -17,7 +31,7 @@ var optionsMessageDetailsOriginal = {
     json: true,
     headers: {
         'Content-Type': 'application/json; charset=utf-8',
-        'Authorization': 'Bearer OWIyNDZmZjAtMTI5OS00ODk5LWExMWUtZDA3NTQ2MzIzM2RiYWRhY2UxNGYtZjMw'
+        'Authorization': 'Bearer ' + ciscospark_apikey
     }
 };
 
@@ -44,63 +58,15 @@ var MarkItOnDemandAPI = {
     }
 };
 
-var jsonParser = (bodyParser.json());
-
-app.post('/', jsonParser, function(req, res) {
-    var inJSONBody = req.body;
-    console.log("inJSONBody = "+ JSON.stringify(inJSONBody));
-    if ( inJSONBody.data.personEmail != "sparquelles@sparkbot.io") {
-        console.log("processing a message for "+inJSONBody.data.personEmail);
-        var messageId = inJSONBody['data']['id'];
-        console.log('messageId: ' + messageId);
-        var optionsMessageDetails = optionsMessageDetailsOriginal;
-        optionsMessageDetails['url'] = 'https://api.ciscospark.com/v1/messages/'+messageId;
-        
-        request.get(optionsMessageDetails, function(error, response, body) {
-            console.log("before response.get call");
-            console.log("optionsMessageDetails = "+ JSON.stringify(optionsMessageDetails));
-            console.log("msg text ="+ JSON.stringify(response));
-            if (response.toJSON()['body']['text'] != undefined) {
-                console.log("passing: "+response.toJSON()['body']['text'] );
-                fy.snapshot({ 
-                        symbol: response.toJSON()['body']['text'] 
-                }, function (err, snapshot) {
-                    //console.log("error is "+err);
-                    //console.log("recieved a quote of "+snapshot['ask']);
-                    //console.log("body = "+JSON.stringify(body));
-                    //console.log("manually aborting 1");
-                    //process.exit();
-                    if ( snapshot.ask == null)
-                        post_message("No such stock symbol was found", 
-                                        body['id'], 
-                                        body['personId']
-                                        /*inJSONBody['personEmail']*/);
-                    else
-                        post_message(snapshot.name+" has an asking price of "+
-                                     snapshot['ask']+", with an EPS of "+
-                                     snapshot.earningsPerShare+
-                                     ". This price is a "+
-                                     snapshot.percentChangeFrom50DayMovingAverage+
-                                     " change from its 50 day moving average.",
-                                     body['id'], body['personId']
-                                     /*inJSONBody['personEmail']*/);
-                });
-            }
-        });
-    }
-    res.end();
-});
-
-
 function get_lookup_stock(stock_name) {
     if (stock_name === '') {
         console.log('no applicable stock name')
         return [];
     };
     MarkItOnDemandAPI['path'] = '/v2/Lookup/json?input=' + stock_name;
-    console.log(MarkItOnDemandAPI['url'] = 'http://' + 
+    console.log(MarkItOnDemandAPI['url'] = 'http://' +
                     MarkItOnDemandAPI['host'] + MarkItOnDemandAPI['path']);
-    MarkItOnDemandAPI['url'] = 'http://' + 
+    MarkItOnDemandAPI['url'] = 'http://' +
             MarkItOnDemandAPI['host'] + MarkItOnDemandAPI['path'];
     request.get(MarkItOnDemandAPI, function(error, response, body) {
         console.log(response);
@@ -142,7 +108,7 @@ function post_message(message_text, roomid, personId) {
         body: myJSONObject,
         headers: {
             'Content-Type': "application/json; charset=utf-8",
-            'Authorization': "Bearer OWIyNDZmZjAtMTI5OS00ODk5LWExMWUtZDA3NTQ2MzIzM2RiYWRhY2UxNGYtZjMw"
+            'Authorization': "Bearer " + ciscospark_apikey
         }
     }, function (error, response, body){
         //console.log("myJSONObject = "+JSON.stringify(myJSONObject));
@@ -154,6 +120,54 @@ function post_message(message_text, roomid, personId) {
         //process.exit();
     });
 }
+
+
+var jsonParser = (bodyParser.json());
+
+app.post('/', jsonParser, function(req, res) {
+    var inJSONBody = req.body;
+    console.log("inJSONBody = "+ JSON.stringify(inJSONBody));
+    if ( inJSONBody.data.personEmail != "sparquelles@sparkbot.io") {
+        console.log("processing a message for "+inJSONBody.data.personEmail);
+        var messageId = inJSONBody['data']['id'];
+        console.log('messageId: ' + messageId);
+        var optionsMessageDetails = optionsMessageDetailsOriginal;
+        optionsMessageDetails['url'] = 'https://api.ciscospark.com/v1/messages/'+messageId;
+
+        request.get(optionsMessageDetails, function(error, response, body) {
+            console.log("before response.get call");
+            console.log("optionsMessageDetails = "+ JSON.stringify(optionsMessageDetails));
+            console.log("msg text ="+ JSON.stringify(response));
+            if (response.toJSON()['body']['text'] != undefined) {
+                console.log("passing: "+response.toJSON()['body']['text'] );
+                fy.snapshot({
+                        symbol: response.toJSON()['body']['text']
+                }, function (err, snapshot) {
+                    //console.log("error is "+err);
+                    //console.log("recieved a quote of "+snapshot['ask']);
+                    //console.log("body = "+JSON.stringify(body));
+                    //console.log("manually aborting 1");
+                    //process.exit();
+                    if ( snapshot.ask == null)
+                        post_message("No such stock symbol was found",
+                                        body['id'],
+                                        body['personId']
+                                        /*inJSONBody['personEmail']*/);
+                    else
+                        post_message(snapshot.name+" has an asking price of "+
+                                     snapshot['ask']+", with an EPS of "+
+                                     snapshot.earningsPerShare+
+                                     ". This price is a "+
+                                     snapshot.percentChangeFrom50DayMovingAverage+
+                                     " change from its 50 day moving average.",
+                                     body['id'], body['personId']
+                                     /*inJSONBody['personEmail']*/);
+                });
+            }
+        });
+    }
+    res.end();
+});
 
 
 app.listen(80, function() {
