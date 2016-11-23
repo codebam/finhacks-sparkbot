@@ -14,7 +14,11 @@ var fs = require('fs');
 var ciscospark_apikey = '';
 var api_key;
 fs.readFile('auth_tokens.json', 'utf8', function (err, data) {
-    if (err) throw err;
+    if (err){
+            console.log('Copy the sample auth tokens file to auth_tokens.json and add your auth token(s)');
+            throw err;
+
+    }
     apikey = JSON.parse(data);
     try {
         ciscospark_apikey = apikey["auth_tokens"]["cisco_spark"]["api_key"];
